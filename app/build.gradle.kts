@@ -119,6 +119,7 @@ dependencies {
     //kapt("groupId:artifactId:version")
     // To use Kotlin Symbol Processing (KSP)
     ksp("androidx.room:room-compiler:$room_version")
+   //s implementation("androidx.core:core-ktx:2.2.0")
 
 
 }
