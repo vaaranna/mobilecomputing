@@ -8,18 +8,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -30,9 +34,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import coil.compose.rememberAsyncImagePainter
 
-data class Message(val author: String, val body: String)
+@Entity
+data class Message(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val author: String,
+    val body: String
+)
 
 
 @Composable
@@ -110,11 +122,11 @@ data class Message(val author: String, val body: String)
     object SampleData {
         // Sample conversation data
         val conversationSample = listOf(
-            Message(
+            Message(0,
                 "Lexi",
                 "Test...Test...Test..."
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 """List of Android versions:
             |Android KitKat (API 19)
@@ -127,51 +139,51 @@ data class Message(val author: String, val body: String)
             |Android 11 (API 30)
             |Android 12 (API 31)""".trim()
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 """I think Kotlin is my favorite programming language.
             |It's so much fun!""".trim()
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "Searching for alternatives to XML layouts..."
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 """Hey, take a look at Jetpack Compose, it's great!
             |It's the Android's modern toolkit for building native UI.
             |It simplifies and accelerates UI development on Android.
             |Less code, powerful tools, and intuitive Kotlin APIs :)""".trim()
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "It's available from API 21+ :)"
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "Writing Kotlin for UI seems so natural, Compose where have you been all my life?"
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "Android Studio next version's name is Arctic Fox"
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "Android Studio Arctic Fox tooling for Compose is top notch ^_^"
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "I didn't know you can now run the emulator directly from Android Studio"
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "Compose Previews are great to check quickly how a composable layout looks like"
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "Previews are also interactive after enabling the experimental setting"
             ),
-            Message(
+            Message(0,
                 "Lexi",
                 "Have you tried writing build.gradle with KTS?"
             ),
@@ -180,24 +192,49 @@ data class Message(val author: String, val body: String)
 
     @Composable
     fun Conversation(
-        messages: List<Message>,
         navController: NavHostController,
-        viewModel: UserViewModel) {
-     //   val user by userViewModel.user.observeAsState()
+        chatViewModel: ChatViewModel,
+        userViewModel: UserViewModel) {
+        val messages by chatViewModel.messages.observeAsState(emptyList())
+        var newMessage by remember { mutableStateOf("") }
+        val listState = rememberLazyListState()
 
-        LazyColumn {
-            items(messages) { message ->
-                MessageCard(message, viewModel)
-            }
-        }
+        Column {
             Button(
                 onClick = { navController.navigate("second") }
             ) {
                 Text("My profile")
-            }
         }
+            LazyColumn (
+                state = listState,
+                modifier = Modifier.weight(1f)
+            ) {
+                items(messages) { message ->
+                    MessageCard(message, userViewModel)
+                }
+            }
+            TextField(
+                value = newMessage,
+                onValueChange = { newMessage = it },
+                label = { Text("New message") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(
+                onClick = {
+                    chatViewModel.addMessage("User", newMessage)
+                    newMessage = ""
+                }
+            ) {
+                Text("Send")
+            }
+            LaunchedEffect(messages) {
+                if (messages.isNotEmpty()) {
+                    listState.animateScrollToItem(messages.size - 1) // scroll to last item
+                }
+            }
 
 
-    //@Composable
-    //fun Preview(navController: NavController) {
+        }
+    }
+
 

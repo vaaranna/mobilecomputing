@@ -37,12 +37,14 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+
     }
     kotlinOptions {
         jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -65,10 +67,12 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("" +
-            "androidx.compose.ui:ui-tooling-preview-android:1.6.1")
+            "androidx.compose.ui:ui-tooling-preview-android:1.6.2")
     implementation("androidx.room:room-common:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    implementation("com.google.ai.client.generativeai:generativeai:0.1.2")
+    implementation("com.google.ai.client.generativeai:generativeai:0.2.1")
+    implementation("androidx.camera:camera-core:1.3.1")
+    implementation("androidx.camera:camera-lifecycle:1.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -77,7 +81,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     val nav_version = "2.7.7"
-    val material = "1.6.1"
+    val material = "1.6.2"
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.compose.material:material-icons-core:$material")
     implementation("androidx.compose.material:material-icons-extended:$material")
@@ -112,14 +116,30 @@ dependencies {
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
 
-    implementation ("androidx.compose.runtime:runtime-livedata:1.6.1")
-    implementation("androidx.compose.runtime:runtime:1.6.1")
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.1")
-    implementation("androidx.compose.runtime:runtime-rxjava2:1.6.1")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.2")
+    implementation("androidx.compose.runtime:runtime:1.6.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.2")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.6.2")
     //kapt("groupId:artifactId:version")
     // To use Kotlin Symbol Processing (KSP)
     ksp("androidx.room:room-compiler:$room_version")
    //s implementation("androidx.core:core-ktx:2.2.0")
+        val activity_version = "1.8.2"
+        // Kotlin
+        implementation("androidx.activity:activity-ktx:$activity_version")
 
+        val fragment_version = "1.6.2"
+        // Kotlin
+        implementation("androidx.fragment:fragment-ktx:$fragment_version")
+        // Testing Fragments in Isolation
+        debugImplementation("androidx.fragment:fragment-testing:$fragment_version")
+    // CameraX core library using the camera2 implementation
+    val camerax_version = "1.3.1"
+    implementation ("androidx.camera:camera-core:${camerax_version}")
+    implementation ("androidx.camera:camera-camera2:${camerax_version}")
+    implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
+    implementation ("androidx.camera:camera-video:${camerax_version}")
 
-}
+    implementation ("androidx.camera:camera-view:${camerax_version}")
+    implementation ("androidx.camera:camera-extensions:${camerax_version}")
+    }

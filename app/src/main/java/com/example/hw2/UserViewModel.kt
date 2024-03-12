@@ -17,13 +17,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         Room.databaseBuilder(application, UserDatabase::class.java, "userprofile")
             .fallbackToDestructiveMigration()
             .build()
-
     }
-
     init {
         loadUser()
     }
-
 
     fun saveUserProfile(username: String, imageUri: String?) {
         viewModelScope.launch(Dispatchers.IO) {

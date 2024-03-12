@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -47,30 +46,33 @@ import coil.compose.AsyncImage
     fun SecondScreen(navController: NavController, userViewModel: UserViewModel) {
         val user by userViewModel.user.observeAsState()
 
-    var imageUri by remember {
-        mutableStateOf(user?.image?: "")
-    }
-    var username by remember { mutableStateOf(user?.username?:"") }
-        val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
-            try {
-                val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                val contentResolver = context.contentResolver
-                contentResolver.takePersistableUriPermission(uri, takeFlags)
-                imageUri = uri.toString()
-            } catch (e: Exception) {
-                Log.e("main activity", "error granting persistable permission", e)
-            }
-
+        var imageUri by remember {
+            mutableStateOf(user?.image ?: "")
         }
-    }
+        var username by remember { mutableStateOf(user?.username ?: "") }
+        val context = LocalContext.current
+        val launcher =
+            rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+                uri?.let {
+                    try {
+                        val takeFlags: Int =
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        val contentResolver = context.contentResolver
+                        contentResolver.takePersistableUriPermission(uri, takeFlags)
+                        imageUri = uri.toString()
+                    } catch (e: Exception) {
+                        Log.e("main activity", "error granting persistable permission", e)
+                    }
+
+                }
+            }
         var hasNotificationPermission by remember {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 mutableStateOf(
                     ContextCompat.checkSelfPermission(
                         context,
-                        android.Manifest.permission.POST_NOTIFICATIONS)
+                        android.Manifest.permission.POST_NOTIFICATIONS
+                    )
                             == PackageManager.PERMISSION_GRANTED
                 )
             } else mutableStateOf(true)
@@ -79,18 +81,17 @@ import coil.compose.AsyncImage
             showNotification(context)
         }
         sensorManager.start()
-    Column(
-        modifier = Modifier.padding(all = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    )
-    {
-        Button(
-            onClick = { navController.popBackStack() },
-            // modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Conversation")
-        }
-
+        Column(
+            modifier = Modifier.padding(all = 8.dp),
+            //   verticalArrangement = Arrangement.spacedBy(8.dp)
+            )
+        {
+            Button(
+                onClick = { navController.popBackStack() },
+                // modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Conversation")
+            }
             AsyncImage(
                 model = imageUri,
                 contentDescription = null,
@@ -104,41 +105,45 @@ import coil.compose.AsyncImage
                         launcher.launch(arrayOf("image/*"))
                     }
             )
+            Text("Profile Name")
 
-        Text("My profile")
-        OutlinedTextField(
-            value = username,
-            onValueChange = { newText -> username = newText },
-            label = { Text("my name") }
-        )
-        Button(
-            onClick = {
-                if (username.isNotEmpty() && imageUri.isNotEmpty()) {
-                    userViewModel.saveUserProfile(username, imageUri)
+            OutlinedTextField(
+                value = username,
+                onValueChange = { newText -> username = newText },
+                label = { Text("my name") }
+            )
+            Button(
+                onClick = {
+                    if (username.isNotEmpty() && imageUri.isNotEmpty()) {
+                        userViewModel.saveUserProfile(username, imageUri)
+                    }
                 }
+            ) {
+                //   modifier = Modifier.padding(vertical = 8.dp)
+                Text("Save your profile")
             }
-        ) {
-         //   modifier = Modifier.padding(vertical = 8.dp)
-            Text("Save your profile")
-        }
-        val notificationLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission(),
-            onResult = { isGranted ->
-                hasNotificationPermission = isGranted
+            val notificationLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission(),
+                onResult = { isGranted ->
+                    hasNotificationPermission = isGranted
+                }
+            )
+            Button(onClick = {
+                notificationLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
-        )
-        Button(onClick = {
-            notificationLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-        }) {
-            Text(text = "Allow notifications")
-        }
-        Button(onClick = {
-            showNotification(context)
-        }) {
-            Text(text = "Show notification")
+            ) {
+                Text(text = "Allow notifications")
+            }
+            Button(onClick = {
+                showNotification(context)
+            }
+            ) {
+                Text(text = "Show notification")
+            }
         }
     }
-}
+
+
 private fun showNotification(context: Context) {
     createNotificationChannel(context)
 
@@ -172,6 +177,8 @@ fun createNotificationChannel(context: Context) {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
-
 }
+
+
+
 
